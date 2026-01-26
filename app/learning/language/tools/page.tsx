@@ -352,8 +352,11 @@ export default function LanguageTools() {
       // 生成词汇数据库
       const vocabularyDatabase = generateVocabularyDatabase()
       
-      const translation = vocabularyDatabase[inputWord.toLowerCase()] || {
-        meaning: '翻译结果',
+      // 在数组中查找单词（不区分大小写）
+      const translation = vocabularyDatabase.find(
+        (item: any) => item.word.toLowerCase() === inputWord.toLowerCase().trim()
+      ) || {
+        meaning: '未找到该单词',
         example: `This is an example of "${inputWord}".`,
         category: '其他'
       }
