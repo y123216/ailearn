@@ -347,29 +347,26 @@ export default function LanguageTools() {
     
     setIsTranslating(true)
     
-    // 模拟翻译API调用
-    setTimeout(() => {
-      // 生成词汇数据库
-      const vocabularyDatabase = generateVocabularyDatabase()
-      
-      // 在数组中查找单词（不区分大小写）
-      const translation = vocabularyDatabase.find(
-        (item: any) => item.word.toLowerCase() === inputWord.toLowerCase().trim()
-      ) || {
-        meaning: '未找到该单词',
-        example: `This is an example of "${inputWord}".`,
-        category: '其他'
-      }
-      
-      setTranslatedWord({
-        word: inputWord,
-        meaning: translation.meaning,
-        example: translation.example,
-        category: translation.category
-      })
-      
-      setIsTranslating(false)
-    }, 1000)
+    // 生成词汇数据库并查找单词
+    const vocabularyDatabase = generateVocabularyDatabase()
+    
+    // 在数组中查找单词（不区分大小写）
+    const translation = vocabularyDatabase.find(
+      (item: any) => item.word.toLowerCase() === inputWord.toLowerCase().trim()
+    ) || {
+      meaning: '未找到该单词',
+      example: `This is an example of "${inputWord}".`,
+      category: '其他'
+    }
+    
+    setTranslatedWord({
+      word: inputWord,
+      meaning: translation.meaning,
+      example: translation.example,
+      category: translation.category
+    })
+    
+    setIsTranslating(false)
   }
 
   // 同步到单词卡
