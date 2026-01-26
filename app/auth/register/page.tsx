@@ -50,14 +50,8 @@ export default function RegisterPage() {
         throw new Error('注册失败，请稍后重试')
       }
 
-      const data = await response.json()
-      
-      // 存储token和用户信息
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      
-      // 重定向到学习平台
-      window.location.href = '/learning'
+      // 注册成功后重定向到登录页面
+      window.location.href = '/auth/login'
     } catch (err) {
       setError(err instanceof Error ? err.message : '注册失败')
     } finally {
