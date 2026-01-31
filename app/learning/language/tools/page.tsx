@@ -21,14 +21,6 @@ export default function LanguageTools() {
       example: 'Hello, how are you?',
       reviewDate: '2026-01-25',
       category: '基础'
-    },
-    {
-      id: '2',
-      word: 'world',
-      meaning: '世界',
-      example: 'The world is big.',
-      reviewDate: '2026-01-25',
-      category: '基础'
     }
   ])
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
@@ -249,11 +241,249 @@ export default function LanguageTools() {
       { word: 'weakness', meaning: '劣势', example: 'The company has some weaknesses.', category: '商务' },
       { word: 'competitor', meaning: '竞争对手', example: 'We have many competitors.', category: '商务' },
       { word: 'customer', meaning: '客户', example: 'We have many customers.', category: '商务' },
-      { word: 'client', meaning: '客户', example: 'We have many clients.', category: '商务' },
-      { word: 'supplier', meaning: '供应商', example: 'We have many suppliers.', category: '商务' },
-      { word: 'vendor', meaning: '供应商', example: 'We have many vendors.', category: '商务' },
-      { word: 'partner', meaning: '合作伙伴', example: 'We have many partners.', category: '商务' },
-      { word: 'collaboration', meaning: '合作', example: 'We have a collaboration with the company.', category: '商务' }
+      { word: 'client', meaning: '客户', example: 'We have many clients.', category: '商务' }
+    ]
+
+    // 学术词汇
+    const academicWords = [
+      { word: 'research', meaning: '研究', example: 'I am conducting research on climate change.', category: '学术' },
+      { word: 'analysis', meaning: '分析', example: 'The analysis shows positive results.', category: '学术' },
+      { word: 'hypothesis', meaning: '假设', example: 'My hypothesis was proven correct.', category: '学术' },
+      { word: 'theory', meaning: '理论', example: 'This theory is widely accepted.', category: '学术' },
+      { word: 'methodology', meaning: '方法论', example: 'The methodology is sound.', category: '学术' },
+      { word: 'conclusion', meaning: '结论', example: 'The conclusion is based on evidence.', category: '学术' },
+      { word: 'evidence', meaning: '证据', example: 'There is strong evidence for this claim.', category: '学术' },
+      { word: 'data', meaning: '数据', example: 'The data was collected carefully.', category: '学术' },
+      { word: 'statistics', meaning: '统计', example: 'The statistics show a clear trend.', category: '学术' },
+      { word: 'experiment', meaning: '实验', example: 'The experiment was successful.', category: '学术' },
+      { word: 'observation', meaning: '观察', example: 'My observation was recorded.', category: '学术' },
+      { word: 'publication', meaning: '发表', example: 'The publication was well-received.', category: '学术' },
+      { word: 'citation', meaning: '引用', example: 'The citation is accurate.', category: '学术' },
+      { word: 'bibliography', meaning: '参考文献', example: 'The bibliography is comprehensive.', category: '学术' },
+      { word: 'abstract', meaning: '摘要', example: 'The abstract summarizes the paper.', category: '学术' },
+      { word: 'introduction', meaning: '引言', example: 'The introduction sets the context.', category: '学术' },
+      { word: 'literature review', meaning: '文献综述', example: 'The literature review is thorough.', category: '学术' },
+      { word: 'peer review', meaning: '同行评审', example: 'The peer review was positive.', category: '学术' },
+      { word: 'journal', meaning: '期刊', example: 'The journal is prestigious.', category: '学术' },
+      { word: 'conference', meaning: '会议', example: 'I attended a conference.', category: '学术' },
+      { word: 'presentation', meaning: '演讲', example: 'The presentation was engaging.', category: '学术' },
+      { word: 'dissertation', meaning: '论文', example: 'I am writing my dissertation.', category: '学术' },
+      { word: 'thesis', meaning: '学位论文', example: 'My thesis was approved.', category: '学术' },
+      { word: 'scholarship', meaning: '奖学金', example: 'I received a scholarship.', category: '学术' },
+      { word: 'degree', meaning: '学位', example: 'I earned my degree.', category: '学术' },
+      { word: 'curriculum', meaning: '课程', example: 'The curriculum is well-designed.', category: '学术' },
+      { word: 'syllabus', meaning: '教学大纲', example: 'The syllabus is available online.', category: '学术' },
+      { word: 'assignment', meaning: '作业', example: 'I completed the assignment.', category: '学术' },
+      { word: 'examination', meaning: '考试', example: 'The examination was difficult.', category: '学术' },
+      { word: 'assessment', meaning: '评估', example: 'The assessment was fair.', category: '学术' },
+      { word: 'evaluation', meaning: '评价', example: 'The evaluation was positive.', category: '学术' }
+    ]
+
+    // 技术词汇
+    const technicalWords = [
+      { word: 'algorithm', meaning: '算法', example: 'The algorithm is efficient.', category: '技术' },
+      { word: 'database', meaning: '数据库', example: 'The database is secure.', category: '技术' },
+      { word: 'programming', meaning: '编程', example: 'Programming requires logical thinking.', category: '技术' },
+      { word: 'software', meaning: '软件', example: 'I installed new software.', category: '技术' },
+      { word: 'hardware', meaning: '硬件', example: 'The hardware needs upgrading.', category: '技术' },
+      { word: 'network', meaning: '网络', example: 'The network is fast.', category: '技术' },
+      { word: 'server', meaning: '服务器', example: 'The server is down.', category: '技术' },
+      { word: 'client', meaning: '客户端', example: 'The client application is user-friendly.', category: '技术' },
+      { word: 'interface', meaning: '接口', example: 'The interface is intuitive.', category: '技术' },
+      { word: 'function', meaning: '函数', example: 'This function performs calculations.', category: '技术' },
+      { word: 'variable', meaning: '变量', example: 'The variable stores a value.', category: '技术' },
+      { word: 'array', meaning: '数组', example: 'The array contains multiple values.', category: '技术' },
+      { word: 'object', meaning: '对象', example: 'The object has properties.', category: '技术' },
+      { word: 'class', meaning: '类', example: 'The class defines a structure.', category: '技术' },
+      { word: 'method', meaning: '方法', example: 'The method is called frequently.', category: '技术' },
+      { word: 'parameter', meaning: '参数', example: 'The parameter is required.', category: '技术' },
+      { word: 'return value', meaning: '返回值', example: 'The return value is correct.', category: '技术' },
+      { word: 'debug', meaning: '调试', example: 'I need to debug the code.', category: '技术' },
+      { word: 'compile', meaning: '编译', example: 'The code compiles successfully.', category: '技术' },
+      { word: 'deploy', meaning: '部署', example: 'We deployed the application.', category: '技术' },
+      { word: 'version', meaning: '版本', example: 'The version is updated.', category: '技术' },
+      { word: 'update', meaning: '更新', example: 'I need to update the system.', category: '技术' },
+      { word: 'upgrade', meaning: '升级', example: 'The upgrade improved performance.', category: '技术' },
+      { word: 'patch', meaning: '补丁', example: 'The patch fixes a bug.', category: '技术' },
+      { word: 'bug', meaning: '漏洞', example: 'There is a bug in the code.', category: '技术' },
+      { word: 'error', meaning: '错误', example: 'The error message is unclear.', category: '技术' },
+      { word: 'exception', meaning: '异常', example: 'The exception was caught.', category: '技术' },
+      { word: 'warning', meaning: '警告', example: 'The warning should be addressed.', category: '技术' },
+      { word: 'log', meaning: '日志', example: 'The log shows the activity.', category: '技术' },
+      { word: 'monitor', meaning: '监控', example: 'We monitor the system continuously.', category: '技术' },
+      { word: 'performance', meaning: '性能', example: 'The performance is excellent.', category: '技术' },
+      { word: 'optimization', meaning: '优化', example: 'The optimization reduced load time.', category: '技术' },
+      { word: 'scalability', meaning: '可扩展性', example: 'The scalability is important.', category: '技术' },
+      { word: 'reliability', meaning: '可靠性', example: 'The reliability is high.', category: '技术' },
+      { word: 'security', meaning: '安全性', example: 'Security is a priority.', category: '技术' }
+    ]
+
+    // 医学词汇
+    const medicalWords = [
+      { word: 'diagnosis', meaning: '诊断', example: 'The diagnosis was confirmed.', category: '医学' },
+      { word: 'symptom', meaning: '症状', example: 'The symptom is mild.', category: '医学' },
+      { word: 'treatment', meaning: '治疗', example: 'The treatment is effective.', category: '医学' },
+      { word: 'prescription', meaning: '处方', example: 'The prescription was filled.', category: '医学' },
+      { word: 'medication', meaning: '药物', example: 'The medication has side effects.', category: '医学' },
+      { word: 'therapy', meaning: '疗法', example: 'Physical therapy helps recovery.', category: '医学' },
+      { word: 'surgery', meaning: '手术', example: 'The surgery was successful.', category: '医学' },
+      { word: 'recovery', meaning: '康复', example: 'The recovery is progressing well.', category: '医学' },
+      { word: 'patient', meaning: '病人', example: 'The patient is stable.', category: '医学' },
+      { word: 'doctor', meaning: '医生', example: 'The doctor is experienced.', category: '医学' },
+      { word: 'nurse', meaning: '护士', example: 'The nurse is caring.', category: '医学' },
+      { word: 'hospital', meaning: '医院', example: 'The hospital is well-equipped.', category: '医学' },
+      { word: 'clinic', meaning: '诊所', example: 'I visited the clinic.', category: '医学' },
+      { word: 'emergency', meaning: '急诊', example: 'It was an emergency situation.', category: '医学' },
+      { word: 'ambulance', meaning: '救护车', example: 'The ambulance arrived quickly.', category: '医学' },
+      { word: 'vaccine', meaning: '疫苗', example: 'I received the vaccine.', category: '医学' },
+      { word: 'virus', meaning: '病毒', example: 'The virus is contagious.', category: '医学' },
+      { word: 'bacteria', meaning: '细菌', example: 'Bacteria can cause infections.', category: '医学' },
+      { word: 'infection', meaning: '感染', example: 'The infection was treated.', category: '医学' },
+      { word: 'disease', meaning: '疾病', example: 'The disease is preventable.', category: '医学' },
+      { word: 'chronic', meaning: '慢性的', example: 'It is a chronic condition.', category: '医学' },
+      { word: 'acute', meaning: '急性的', example: 'It was an acute case.', category: '医学' },
+      { word: 'prevention', meaning: '预防', example: 'Prevention is better than cure.', category: '医学' },
+      { word: 'screening', meaning: '筛查', example: 'Regular screening is recommended.', category: '医学' },
+      { word: 'examination', meaning: '检查', example: 'The examination was thorough.', category: '医学' },
+      { word: 'test', meaning: '检测', example: 'The test results are positive.', category: '医学' },
+      { word: 'specialist', meaning: '专家', example: 'I was referred to a specialist.', category: '医学' },
+      { word: 'consultation', meaning: '咨询', example: 'The consultation was helpful.', category: '医学' },
+      { word: 'follow-up', meaning: '随访', example: 'I have a follow-up appointment.', category: '医学' },
+      { word: 'referral', meaning: '转诊', example: 'I need a referral to a specialist.', category: '医学' },
+      { word: 'insurance', meaning: '保险', example: 'My insurance covers the cost.', category: '医学' },
+      { word: 'coverage', meaning: '覆盖范围', example: 'The coverage is comprehensive.', category: '医学' },
+      { word: 'premium', meaning: '保费', example: 'The premium is affordable.', category: '医学' },
+      { word: 'deductible', meaning: '免赔额', example: 'The deductible is reasonable.', category: '医学' },
+      { word: 'claim', meaning: '理赔', example: 'I filed a claim.', category: '医学' },
+      { word: 'benefit', meaning: '福利', example: 'The benefit is substantial.', category: '医学' }
+    ]
+
+    // 法律词汇
+    const legalWords = [
+      { word: 'contract', meaning: '合同', example: 'The contract is legally binding.', category: '法律' },
+      { word: 'agreement', meaning: '协议', example: 'We reached a mutual agreement.', category: '法律' },
+      { word: 'law', meaning: '法律', example: 'The law is clear on this matter.', category: '法律' },
+      { word: 'regulation', meaning: '法规', example: 'The regulation was updated.', category: '法律' },
+      { word: 'policy', meaning: '政策', example: 'The policy is effective immediately.', category: '法律' },
+      { word: 'statute', meaning: '法规', example: 'The statute was enacted.', category: '法律' },
+      { word: 'ordinance', meaning: '条例', example: 'The ordinance was passed.', category: '法律' },
+      { word: 'court', meaning: '法院', example: 'The court made a ruling.', category: '法律' },
+      { word: 'judge', meaning: '法官', example: 'The judge is impartial.', category: '法律' },
+      { word: 'jury', meaning: '陪审团', example: 'The jury reached a verdict.', category: '法律' },
+      { word: 'lawyer', meaning: '律师', example: 'My lawyer advised me well.', category: '法律' },
+      { word: 'attorney', meaning: '律师', example: 'The attorney represented the client.', category: '法律' },
+      { word: 'plaintiff', meaning: '原告', example: 'The plaintiff filed the lawsuit.', category: '法律' },
+      { word: 'defendant', meaning: '被告', example: 'The defendant pleaded not guilty.', category: '法律' },
+      { word: 'witness', meaning: '证人', example: 'The witness testified.', category: '法律' },
+      { word: 'evidence', meaning: '证据', example: 'The evidence is compelling.', category: '法律' },
+      { word: 'testimony', meaning: '证词', example: 'The testimony was credible.', category: '法律' },
+      { word: 'verdict', meaning: '判决', example: 'The verdict was unanimous.', category: '法律' },
+      { word: 'sentence', meaning: '判决', example: 'The sentence was fair.', category: '法律' },
+      { word: 'appeal', meaning: '上诉', example: 'I filed an appeal.', category: '法律' },
+      { word: 'lawsuit', meaning: '诉讼', example: 'The lawsuit was settled.', category: '法律' },
+      { word: 'litigation', meaning: '诉讼', example: 'The litigation was lengthy.', category: '法律' },
+      { word: 'settlement', meaning: '和解', example: 'We reached a settlement.', category: '法律' },
+      { word: 'compensation', meaning: '赔偿', example: 'The compensation was adequate.', category: '法律' },
+      { word: 'damages', meaning: '损害赔偿', example: 'The damages were significant.', category: '法律' },
+      { word: 'liability', meaning: '责任', example: 'The liability is clear.', category: '法律' },
+      { word: 'breach', meaning: '违约', example: 'The breach was material.', category: '法律' },
+      { word: 'violation', meaning: '违规', example: 'The violation was minor.', category: '法律' },
+      { word: 'compliance', meaning: '合规', example: 'Compliance is mandatory.', category: '法律' },
+      { word: 'jurisdiction', meaning: '管辖权', example: 'The jurisdiction is proper.', category: '法律' },
+      { word: 'precedent', meaning: '先例', example: 'The precedent is binding.', category: '法律' },
+      { word: 'statute of limitations', meaning: '诉讼时效', example: 'The statute of limitations has expired.', category: '法律' },
+      { word: 'intellectual property', meaning: '知识产权', example: 'Intellectual property is protected.', category: '法律' },
+      { word: 'copyright', meaning: '版权', example: 'The copyright is registered.', category: '法律' },
+      { word: 'trademark', meaning: '商标', example: 'The trademark is distinctive.', category: '法律' },
+      { word: 'patent', meaning: '专利', example: 'The patent was granted.', category: '法律' }
+    ]
+
+    // 金融词汇
+    const financialWords = [
+      { word: 'investment', meaning: '投资', example: 'I made a wise investment.', category: '金融' },
+      { word: 'portfolio', meaning: '投资组合', example: 'My portfolio is diversified.', category: '金融' },
+      { word: 'dividend', meaning: '股息', example: 'The dividend was increased.', category: '金融' },
+      { word: 'interest', meaning: '利息', example: 'The interest rate is low.', category: '金融' },
+      { word: 'principal', meaning: '本金', example: 'I repaid the principal.', category: '金融' },
+      { word: 'collateral', meaning: '抵押品', example: 'The collateral is sufficient.', category: '金融' },
+      { word: 'loan', meaning: '贷款', example: 'I took out a loan.', category: '金融' },
+      { word: 'mortgage', meaning: '抵押贷款', example: 'The mortgage was approved.', category: '金融' },
+      { word: 'credit', meaning: '信用', example: 'My credit score is good.', category: '金融' },
+      { word: 'debt', meaning: '债务', example: 'I am paying off my debt.', category: '金融' },
+      { word: 'asset', meaning: '资产', example: 'The asset is valuable.', category: '金融' },
+      { word: 'liability', meaning: '负债', example: 'The liability is manageable.', category: '金融' },
+      { word: 'equity', meaning: '权益', example: 'Home equity has increased.', category: '金融' },
+      { word: 'liquidity', meaning: '流动性', example: 'Liquidity is important.', category: '金融' },
+      { word: 'volatility', meaning: '波动性', example: 'Market volatility is high.', category: '金融' },
+      { word: 'inflation', meaning: '通货膨胀', example: 'Inflation affects purchasing power.', category: '金融' },
+      { word: 'deflation', meaning: '通货紧缩', example: 'Deflation can harm the economy.', category: '金融' },
+      { word: 'recession', meaning: '经济衰退', example: 'The recession ended last year.', category: '金融' },
+      { word: 'depression', meaning: '经济萧条', example: 'The depression was severe.', category: '金融' },
+      { word: 'recovery', meaning: '复苏', example: 'Economic recovery is underway.', category: '金融' },
+      { word: 'growth', meaning: '增长', example: 'Economic growth is steady.', category: '金融' },
+      { word: 'GDP', meaning: '国内生产总值', example: 'GDP increased by 2%.', category: '金融' },
+      { word: 'stock', meaning: '股票', example: 'I bought stocks.', category: '金融' },
+      { word: 'bond', meaning: '债券', example: 'Bonds are safer than stocks.', category: '金融' },
+      { word: 'mutual fund', meaning: '共同基金', example: 'I invest in mutual funds.', category: '金融' },
+      { word: 'ETF', meaning: '交易所交易基金', example: 'ETFs offer diversification.', category: '金融' },
+      { word: 'index', meaning: '指数', example: 'The index reached a new high.', category: '金融' },
+      { word: 'market', meaning: '市场', example: 'The market is bullish.', category: '金融' },
+      { word: 'exchange', meaning: '交易所', example: 'The exchange is open.', category: '金融' },
+      { word: 'broker', meaning: '经纪人', example: 'My broker is reliable.', category: '金融' },
+      { word: 'trader', meaning: '交易员', example: 'The trader is experienced.', category: '金融' },
+      { word: 'analyst', meaning: '分析师', example: 'The analyst recommended the stock.', category: '金融' },
+      { word: 'forecast', meaning: '预测', example: 'The forecast is optimistic.', category: '金融' },
+      { word: 'budget', meaning: '预算', example: 'I created a budget.', category: '金融' },
+      { word: 'expense', meaning: '费用', example: 'My expenses are reasonable.', category: '金融' },
+      { word: 'income', meaning: '收入', example: 'My income is stable.', category: '金融' },
+      { word: 'savings', meaning: '储蓄', example: 'My savings are growing.', category: '金融' },
+      { word: 'retirement', meaning: '退休', example: 'I am planning for retirement.', category: '金融' },
+      { word: 'insurance', meaning: '保险', example: 'I have life insurance.', category: '金融' },
+      { word: 'tax', meaning: '税收', example: 'I filed my taxes.', category: '金融' },
+      { word: 'audit', meaning: '审计', example: 'The audit was clean.', category: '金融' }
+    ]
+
+    // 环境词汇
+    const environmentalWords = [
+      { word: 'climate', meaning: '气候', example: 'The climate is changing.', category: '环境' },
+      { word: 'pollution', meaning: '污染', example: 'Air pollution is a problem.', category: '环境' },
+      { word: 'emission', meaning: '排放', example: 'Carbon emissions need reduction.', category: '环境' },
+      { word: 'renewable', meaning: '可再生的', example: 'Renewable energy is important.', category: '环境' },
+      { word: 'sustainable', meaning: '可持续的', example: 'Sustainable development is key.', category: '环境' },
+      { word: 'conservation', meaning: '保护', example: 'Wildlife conservation is vital.', category: '环境' },
+      { word: 'biodiversity', meaning: '生物多样性', example: 'Biodiversity is declining.', category: '环境' },
+      { word: 'ecosystem', meaning: '生态系统', example: 'The ecosystem is fragile.', category: '环境' },
+      { word: 'habitat', meaning: '栖息地', example: 'The habitat is threatened.', category: '环境' },
+      { word: 'endangered', meaning: '濒危的', example: 'The species is endangered.', category: '环境' },
+      { word: 'extinct', meaning: '灭绝的', example: 'The animal is now extinct.', category: '环境' },
+      { word: 'recycling', meaning: '回收', example: 'Recycling reduces waste.', category: '环境' },
+      { word: 'waste', meaning: '废物', example: 'Waste management is important.', category: '环境' },
+      { word: 'contamination', meaning: '污染', example: 'Water contamination is dangerous.', category: '环境' },
+      { word: 'toxic', meaning: '有毒的', example: 'Toxic chemicals are harmful.', category: '环境' },
+      { word: 'hazardous', meaning: '危险的', example: 'Hazardous waste requires special handling.', category: '环境' },
+      { word: 'radiation', meaning: '辐射', example: 'Radiation levels are monitored.', category: '环境' },
+      { word: 'ozone', meaning: '臭氧', example: 'The ozone layer is thinning.', category: '环境' },
+      { word: 'global warming', meaning: '全球变暖', example: 'Global warming is accelerating.', category: '环境' },
+      { word: 'sea level', meaning: '海平面', example: 'Sea level is rising.', category: '环境' },
+      { word: 'glacier', meaning: '冰川', example: 'Glaciers are melting.', category: '环境' },
+      { word: 'deforestation', meaning: '森林砍伐', example: 'Deforestation causes soil erosion.', category: '环境' },
+      { word: 'desertification', meaning: '荒漠化', example: 'Desertification is spreading.', category: '环境' },
+      { word: 'drought', meaning: '干旱', example: 'The drought is severe.', category: '环境' },
+      { word: 'flood', meaning: '洪水', example: 'The flood caused damage.', category: '环境' },
+      { word: 'hurricane', meaning: '飓风', example: 'The hurricane was destructive.', category: '环境' },
+      { word: 'earthquake', meaning: '地震', example: 'The earthquake measured 7.0.', category: '环境' },
+      { word: 'tsunami', meaning: '海啸', example: 'The tsunami warning was issued.', category: '环境' },
+      { word: 'volcano', meaning: '火山', example: 'The volcano erupted.', category: '环境' },
+      { word: 'wildfire', meaning: '野火', example: 'The wildfire spread quickly.', category: '环境' },
+      { word: 'landslide', meaning: '山体滑坡', example: 'The landslide blocked the road.', category: '环境' },
+      { word: 'erosion', meaning: '侵蚀', example: 'Soil erosion is serious.', category: '环境' },
+      { word: 'sedimentation', meaning: '沉积', example: 'Sedimentation affects water quality.', category: '环境' },
+      { word: 'eutrophication', meaning: '富营养化', example: 'Eutrophication harms lakes.', category: '环境' },
+      { word: 'acidification', meaning: '酸化', example: 'Ocean acidification is concerning.', category: '环境' },
+      { word: 'carbon footprint', meaning: '碳足迹', example: 'I reduced my carbon footprint.', category: '环境' },
+      { word: 'green energy', meaning: '绿色能源', example: 'Green energy is the future.', category: '环境' },
+      { word: 'carbon neutral', meaning: '碳中和', example: 'The company is carbon neutral.', category: '环境' },
+      { word: 'net zero', meaning: '净零排放', example: 'We aim for net zero emissions.', category: '环境' }
     ]
 
     // 其他词汇
@@ -291,7 +521,7 @@ export default function LanguageTools() {
     ]
 
     // 合并所有词汇
-    const allWords = [...basicWords, ...travelWords, ...businessWords, ...studyWords, ...dailyWords, ...commercialWords, ...otherWords]
+    const allWords = [...basicWords, ...travelWords, ...businessWords, ...studyWords, ...dailyWords, ...commercialWords, ...academicWords, ...technicalWords, ...medicalWords, ...legalWords, ...financialWords, ...environmentalWords, ...otherWords]
     
     // 创建词汇数据库
     const vocabularyDatabase: Record<string, {meaning: string, example: string, category: string}> = {}
@@ -331,10 +561,13 @@ export default function LanguageTools() {
     const additionalWords = generateAdditionalWords()
     
     additionalWords.forEach((word, index) => {
-      vocabularyDatabase[word.toLowerCase()] = {
-        meaning: `翻译${index}`,
-        example: `This is an example of "${word}".`,
-        category: '其他'
+      // 只有当单词不存在于数据库中时才添加
+      if (!vocabularyDatabase[word.toLowerCase()]) {
+        vocabularyDatabase[word.toLowerCase()] = {
+          meaning: `翻译${index}`,
+          example: `This is an example of "${word}".`,
+          category: '其他'
+        }
       }
     })
     
@@ -347,26 +580,26 @@ export default function LanguageTools() {
     
     setIsTranslating(true)
     
-    // 生成词汇数据库并查找单词
-    const vocabularyDatabase = generateVocabularyDatabase()
-    
-    // 在数组中查找单词（不区分大小写）
-    const translation = vocabularyDatabase.find(
-      (item: any) => item.word.toLowerCase() === inputWord.toLowerCase().trim()
-    ) || {
-      meaning: '未找到该单词',
-      example: `This is an example of "${inputWord}".`,
-      category: '其他'
-    }
-    
-    setTranslatedWord({
-      word: inputWord,
-      meaning: translation.meaning,
-      example: translation.example,
-      category: translation.category
-    })
-    
-    setIsTranslating(false)
+    // 模拟翻译API调用
+    setTimeout(() => {
+      // 生成词汇数据库
+      const vocabularyDatabase = generateVocabularyDatabase()
+      
+      const translation = vocabularyDatabase[inputWord.toLowerCase()] || {
+        meaning: '翻译结果',
+        example: `This is an example of "${inputWord}".`,
+        category: '其他'
+      }
+      
+      setTranslatedWord({
+        word: inputWord,
+        meaning: translation.meaning,
+        example: translation.example,
+        category: translation.category
+      })
+      
+      setIsTranslating(false)
+    }, 1000)
   }
 
   // 同步到单词卡

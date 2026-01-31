@@ -153,9 +153,242 @@ export default function UploadExercise() {
   const handleFileSelect = (file: UploadedFile) => {
     setSelectedFile(file)
     if (file.status === 'completed') {
-      // 模拟解析题目
-      setParsedQuestions(mockParsedQuestions)
-      setShowPreview(true)
+      // 模拟文件内容解析过程
+      setShowPreview(false)
+      
+      // 显示解析中状态
+      setTimeout(() => {
+        // 基于文件名、类型和模拟内容智能生成解析题目
+        const questionCount = file.questionsCount || 10
+        const fileName = file.name.toLowerCase()
+        const fileType = file.type
+        
+        // 从文件名中提取主题关键词
+        const extractTopics = (name: string): string[] => {
+          const topics: string[] = []
+          const topicKeywords = {
+            'javascript': ['JavaScript', 'ES6', '异步编程', '闭包', '原型链', '数据类型', '函数', '对象', '数组'],
+            'js': ['JavaScript', 'ES6', '异步编程', '闭包', '原型链', '数据类型', '函数', '对象', '数组'],
+            'react': ['React', '组件', 'Hooks', '状态管理', 'JSX', '生命周期', '虚拟DOM', 'props', 'state'],
+            'vue': ['Vue', '组件', '指令', '生命周期', 'computed', 'watch', 'v-model', '路由'],
+            'angular': ['Angular', '组件', '服务', '依赖注入', '模块', '管道', '指令', '表单'],
+            'html': ['HTML', '标签', '语义化', 'DOM', '表单', '表格', '链接', '图片', 'meta'],
+            'css': ['CSS', '样式', '布局', 'Flexbox', 'Grid', '选择器', '盒模型', '响应式', '动画'],
+            'typescript': ['TypeScript', '类型', '接口', '泛型', '装饰器', '类型推断', '联合类型', '交叉类型'],
+            'node': ['Node.js', '模块', 'fs', 'http', 'express', '中间件', '路由', '数据库', 'API'],
+            'express': ['Express', '中间件', '路由', '请求', '响应', '错误处理', '模板引擎'],
+            'mongodb': ['MongoDB', '数据库', '集合', '文档', '查询', '索引', '聚合', 'Schema'],
+            'mysql': ['MySQL', '数据库', '表', '查询', '索引', '事务', '存储过程', '视图'],
+            'sql': ['SQL', '数据库', '表', '查询', '索引', '事务', '存储过程', '视图'],
+            'git': ['Git', '版本控制', '分支', '提交', '合并', '冲突', '远程仓库', '暂存'],
+            'webpack': ['Webpack', '打包', 'loader', 'plugin', '配置', '优化', '模块', '依赖'],
+            'vite': ['Vite', '打包', '开发服务器', '配置', '插件', '热更新', '模块'],
+            'next': ['Next.js', 'SSR', '路由', 'API路由', '组件', '页面', 'getServerSideProps'],
+            'nuxt': ['Nuxt.js', 'SSR', '路由', '中间件', '组件', '页面', 'asyncData'],
+            '算法': ['算法', '数据结构', '排序', '搜索', '动态规划', '递归', '图', '树'],
+            '数据结构': ['数据结构', '数组', '链表', '栈', '队列', '树', '图', '哈希表'],
+            '网络': ['网络', 'HTTP', 'HTTPS', 'TCP', 'IP', 'DNS', 'WebSocket', 'RESTful'],
+            '安全': ['安全', 'XSS', 'CSRF', '加密', '认证', '授权', 'HTTPS', 'CORS'],
+            '性能': ['性能', '优化', '缓存', '懒加载', '压缩', 'CDN', '渲染', '加载速度'],
+            '测试': ['测试', '单元测试', '集成测试', '端到端测试', 'Jest', 'Cypress', '测试覆盖率'],
+            '设计模式': ['设计模式', '单例', '工厂', '观察者', '策略', '适配器', '装饰器']
+          }
+          
+          for (const [keyword, relatedTopics] of Object.entries(topicKeywords)) {
+            if (name.includes(keyword)) {
+              topics.push(...relatedTopics)
+            }
+          }
+          
+          return topics.length > 0 ? topics : ['前端开发', '编程基础', '代码规范', '最佳实践']
+        }
+        
+        const topics = extractTopics(fileName)
+        
+        // 根据文件类型和主题生成更有针对性的题目
+        const generateQuestions = (count: number, topics: string[], fileType: string) => {
+          const questions: ParsedQuestion[] = []
+          const questionTypes = ['multiple-choice', 'true-false', 'fill-blank']
+          
+          // 基于文件类型和主题生成具体的题目模板
+          const generateQuestionContent = (topic: string, type: string) => {
+            // 选择题模板
+            if (type === 'multiple-choice') {
+              const questionTemplates = {
+                'JavaScript': [
+                  `关于${topic}的选择题：下列哪个选项是正确的${topic}语法？`,
+                  `关于${topic}的选择题：下列哪个${topic}方法可以实现${topic}的功能？`,
+                  `关于${topic}的选择题：在${topic}中，下列哪个选项的说法是正确的？`
+                ],
+                'React': [
+                  `关于${topic}的选择题：下列哪个是正确的${topic}使用方式？`,
+                  `关于${topic}的选择题：在React中，${topic}的作用是什么？`,
+                  `关于${topic}的选择题：下列哪个选项是${topic}的正确语法？`
+                ],
+                'CSS': [
+                  `关于${topic}的选择题：下列哪个CSS属性可以实现${topic}效果？`,
+                  `关于${topic}的选择题：在CSS中，${topic}的正确用法是什么？`,
+                  `关于${topic}的选择题：下列哪个选项是${topic}的正确语法？`
+                ],
+                'HTML': [
+                  `关于${topic}的选择题：下列哪个HTML标签用于${topic}？`,
+                  `关于${topic}的选择题：在HTML中，${topic}的正确属性是什么？`,
+                  `关于${topic}的选择题：下列哪个选项是${topic}的正确用法？`
+                ],
+                'TypeScript': [
+                  `关于${topic}的选择题：在TypeScript中，${topic}的正确定义方式是什么？`,
+                  `关于${topic}的选择题：下列哪个类型定义适用于${topic}？`,
+                  `关于${topic}的选择题：在TypeScript中，${topic}的作用是什么？`
+                ]
+              }
+              
+              const templates = questionTemplates[topic as keyof typeof questionTemplates] || questionTemplates['JavaScript'] || [
+                `关于${topic}的选择题：下列哪个选项是正确的？`,
+                `关于${topic}的选择题：下列哪个说法是正确的？`,
+                `关于${topic}的选择题：下列哪个选项符合${topic}的规范？`
+              ]
+              
+              return templates[Math.floor(Math.random() * templates.length)]
+            }
+            
+            // 判断题模板
+            if (type === 'true-false') {
+              const questionTemplates = {
+                'JavaScript': [
+                  `关于${topic}的判断题：在JavaScript中，${topic}的使用方式是正确的。`,
+                  `关于${topic}的判断题：${topic}是JavaScript的核心概念。`,
+                  `关于${topic}的判断题：${topic}可以提高JavaScript代码的性能。`
+                ],
+                'React': [
+                  `关于${topic}的判断题：在React中，${topic}是必须的。`,
+                  `关于${topic}的判断题：${topic}可以解决React中的状态管理问题。`,
+                  `关于${topic}的判断题：${topic}是React 16.8+的新特性。`
+                ],
+                'CSS': [
+                  `关于${topic}的判断题：${topic}是CSS3的新特性。`,
+                  `关于${topic}的判断题：${topic}可以实现响应式布局。`,
+                  `关于${topic}的判断题：${topic}的浏览器兼容性很好。`
+                ],
+                'HTML': [
+                  `关于${topic}的判断题：${topic}是HTML5的新标签。`,
+                  `关于${topic}的判断题：${topic}可以提高页面的语义化。`,
+                  `关于${topic}的判断题：${topic}的使用有利于SEO。`
+                ]
+              }
+              
+              const templates = questionTemplates[topic as keyof typeof questionTemplates] || questionTemplates['JavaScript'] || [
+                `关于${topic}的判断题：${topic}是一种重要的编程概念。`,
+                `关于${topic}的判断题：${topic}可以提高代码的可维护性。`,
+                `关于${topic}的判断题：${topic}的学习难度较高。`
+              ]
+              
+              return templates[Math.floor(Math.random() * templates.length)]
+            }
+            
+            // 填空题模板
+            if (type === 'fill-blank') {
+              const questionTemplates = {
+                'JavaScript': [
+                  `关于${topic}的填空题：在JavaScript中，${topic}用于______。`,
+                  `关于${topic}的填空题：${topic}的语法格式是______。`,
+                  `关于${topic}的填空题：使用${topic}可以实现______功能。`
+                ],
+                'React': [
+                  `关于${topic}的填空题：在React中，${topic}用于______。`,
+                  `关于${topic}的填空题：${topic}的正确导入方式是______。`,
+                  `关于${topic}的填空题：使用${topic}可以解决______问题。`
+                ],
+                'CSS': [
+                  `关于${topic}的填空题：在CSS中，${topic}属性用于______。`,
+                  `关于${topic}的填空题：${topic}的默认值是______。`,
+                  `关于${topic}的填空题：使用${topic}可以实现______效果。`
+                ],
+                'HTML': [
+                  `关于${topic}的填空题：在HTML中，${topic}标签用于______。`,
+                  `关于${topic}的填空题：${topic}标签的必需属性是______。`,
+                  `关于${topic}的填空题：使用${topic}可以______。`
+                ]
+              }
+              
+              const templates = questionTemplates[topic as keyof typeof questionTemplates] || questionTemplates['JavaScript'] || [
+                `关于${topic}的填空题：${topic}是______的重要概念。`,
+                `关于${topic}的填空题：学习${topic}需要掌握______。`,
+                `关于${topic}的填空题：${topic}的应用场景包括______。`
+              ]
+              
+              return templates[Math.floor(Math.random() * templates.length)]
+            }
+            
+            return `关于${topic}的题目：请回答下列问题。`
+          }
+          
+          // 生成选项
+          const generateOptions = (topic: string, correctAnswer: string) => {
+            const optionCount = 4
+            const options: string[] = [correctAnswer]
+            
+            // 生成干扰选项
+            const distractors = {
+              'JavaScript': ['选项 B', '选项 C', '选项 D', '错误选项', '不正确的语法', '其他方法'],
+              'React': ['其他Hook', '类组件', '旧版API', '选项 B', '选项 C', '选项 D'],
+              'CSS': ['其他属性', '错误值', '废弃语法', '选项 B', '选项 C', '选项 D'],
+              'HTML': ['其他标签', '错误属性', '过时语法', '选项 B', '选项 C', '选项 D']
+            }
+            
+            const topicDistractors = distractors[topic as keyof typeof distractors] || distractors['JavaScript']
+            
+            while (options.length < optionCount) {
+              const distractor = topicDistractors[Math.floor(Math.random() * topicDistractors.length)]
+              if (!options.includes(distractor)) {
+                options.push(distractor)
+              }
+            }
+            
+            // 打乱选项顺序
+            return options.sort(() => Math.random() - 0.5)
+          }
+          
+          // 生成正确答案
+          const generateCorrectAnswer = (topic: string, type: string) => {
+            if (type === 'true-false') {
+              return Math.random() > 0.5 ? '正确' : '错误'
+            }
+            
+            if (type === 'fill-blank') {
+              return topic
+            }
+            
+            return '选项 A'
+          }
+          
+          for (let i = 0; i < count; i++) {
+            const type = questionTypes[Math.floor(Math.random() * questionTypes.length)]
+            const topic = topics[Math.floor(Math.random() * topics.length)]
+            
+            const questionText = generateQuestionContent(topic, type)
+            const correctAnswer = generateCorrectAnswer(topic, type)
+            const options = type === 'multiple-choice' ? generateOptions(topic, correctAnswer) : undefined
+            
+            const question: ParsedQuestion = {
+              id: `q${i+1}`,
+              type: type,
+              question: questionText,
+              options: options,
+              correctAnswer: correctAnswer,
+              difficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random() * 3)],
+              tags: [topic, type === 'multiple-choice' ? '选择题' : type === 'true-false' ? '判断题' : '填空题', '基础']
+            }
+            
+            questions.push(question)
+          }
+          
+          return questions
+        }
+        
+        const generatedQuestions = generateQuestions(questionCount, topics, fileType)
+        setParsedQuestions(generatedQuestions)
+        setShowPreview(true)
+      }, 1500)
     }
   }
 
@@ -201,6 +434,196 @@ export default function UploadExercise() {
       default:
         return '未知'
     }
+  }
+
+  const handleExportQuestions = () => {
+    if (parsedQuestions.length === 0) return
+
+    // 生成HTML内容
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${selectedFile?.name || '导出题目'} - ${new Date().toISOString().split('T')[0]}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      color: #4a4a4a;
+    }
+    .question {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    .question-text {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    .options {
+      margin-bottom: 15px;
+    }
+    .option {
+      margin-bottom: 8px;
+      padding-left: 20px;
+    }
+    .correct-answer {
+      background-color: #e8f5e8;
+      padding: 10px;
+      border-left: 4px solid #4caf50;
+      margin-bottom: 15px;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .difficulty {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .difficulty-easy {
+      background-color: #e8f5e8;
+      color: #4caf50;
+    }
+    .difficulty-medium {
+      background-color: #fff3e0;
+      color: #ff9800;
+    }
+    .difficulty-hard {
+      background-color: #ffebee;
+      color: #f44336;
+    }
+    .export-info {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>${selectedFile?.name || '导出题目'}</h1>
+  
+  <div class="export-info">
+    <p>导出日期: ${new Date().toLocaleString('zh-CN')}</p>
+    <p>题目数量: ${parsedQuestions.length}题</p>
+    <p>原始文件: ${selectedFile?.name || '未知'}</p>
+  </div>
+
+  <h2>题目列表</h2>
+  
+  ${parsedQuestions.map((question, index) => `
+    <div class="question">
+      <div class="question-header">
+        <div class="question-text">${index + 1}. ${question.question}</div>
+        <span class="difficulty difficulty-${question.difficulty}">
+          ${question.difficulty === 'easy' ? '简单' : question.difficulty === 'medium' ? '中等' : '困难'}
+        </span>
+      </div>
+      
+      ${question.options ? `
+        <div class="options">
+          ${question.options.map((option, optIndex) => `
+            <div class="option">${String.fromCharCode(65 + optIndex)}. ${option}</div>
+          `).join('')}
+        </div>
+      ` : ''}
+      
+      ${question.correctAnswer ? `
+        <div class="correct-answer">
+          <strong>正确答案:</strong> ${question.correctAnswer}
+        </div>
+      ` : ''}
+      
+      <div class="tags">
+        ${question.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+      </div>
+    </div>
+  `).join('')}
+</body>
+</html>
+    `
+
+    // 创建Blob对象
+    const blob = new Blob([htmlContent], { type: 'text/html' })
+    
+    // 创建下载链接
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${selectedFile?.name || 'questions'}_export_${new Date().toISOString().split('T')[0]}.html`
+    
+    // 触发下载
+    document.body.appendChild(link)
+    link.click()
+    
+    // 清理
+    setTimeout(() => {
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 100)
+  }
+
+  const handleGeneratePractice = () => {
+    if (parsedQuestions.length === 0) return
+
+    // 使用全部解析到的题目生成练习
+    const practiceQuestions = [...parsedQuestions]
+
+    // 准备练习数据
+    const practiceData = {
+      id: `practice-${Date.now()}`,
+      name: `${selectedFile?.name || '练习'} - ${new Date().toLocaleDateString('zh-CN')}`,
+      createdAt: new Date().toISOString(),
+      questions: practiceQuestions.map((q, index) => ({
+        ...q,
+        questionNumber: index + 1
+      })),
+      totalQuestions: practiceQuestions.length,
+      sourceFile: selectedFile?.name
+    }
+
+    // 保存到localStorage
+    const existingPractices = JSON.parse(localStorage.getItem('practices') || '[]')
+    existingPractices.unshift(practiceData)
+    localStorage.setItem('practices', JSON.stringify(existingPractices))
+
+    // 显示成功消息并跳转到真题模考页面
+    alert(`练习生成成功！已使用全部${practiceQuestions.length}题生成考核试卷。`)
+    
+    // 跳转到真题模考页面
+    setTimeout(() => {
+      window.location.href = '/learning/skills/mock-exam'
+    }, 1000)
   }
 
   return (
@@ -270,9 +693,9 @@ export default function UploadExercise() {
                       <span className={getStatusColor(file.status)}>
                         {getStatusText(file.status)}
                       </span>
-                      {file.status === 'completed' && file.questionsCount && (
+                      {file.status === 'completed' && (
                         <span className="text-green-600">
-                          {file.questionsCount}题
+                          {file.questionsCount || 0}题
                         </span>
                       )}
                     </div>
@@ -324,7 +747,7 @@ export default function UploadExercise() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                         <h4 className="text-sm font-medium text-green-700 mb-1">解析题目数</h4>
-                        <p className="text-2xl font-bold text-green-600">{selectedFile.questionsCount}</p>
+                        <p className="text-2xl font-bold text-green-600">{parsedQuestions.length}</p>
                       </div>
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <h4 className="text-sm font-medium text-blue-700 mb-1">解析成功率</h4>
@@ -383,14 +806,28 @@ export default function UploadExercise() {
                     </div>
 
                     <div className="mt-8 flex justify-center space-x-4">
-                      <button className="btn-primary px-6 py-2">
+                      <button 
+                        className="btn-primary px-6 py-2"
+                        onClick={handleExportQuestions}
+                      >
                         导出题目
                       </button>
-                      <button className="btn-secondary px-6 py-2">
+                      <button 
+                        className="btn-secondary px-6 py-2"
+                        onClick={() => handleGeneratePractice()}
+                      >
                         生成练习
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            ) : selectedFile ? (
+              <div className="card h-full flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <h3 className="text-xl font-medium text-gray-600">正在解析文件...</h3>
+                  <p className="text-gray-500 mt-2">系统正在分析{selectedFile.name}的内容，请稍候...</p>
                 </div>
               </div>
             ) : (

@@ -3,8 +3,9 @@ import { hashPassword } from './utils'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
-interface StoredUser extends User {
+interface StoredUser extends Omit<User, 'createdAt'> {
   password: string
+  createdAt: string
 }
 
 const USERS_FILE = join(process.cwd(), 'data', 'users.json')

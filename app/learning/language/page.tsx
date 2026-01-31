@@ -37,7 +37,7 @@ export default function LanguageLearning() {
                 </svg>
               </div>
               <h2 className="text-xl font-bold mb-4">沉浸式对话练习</h2>
-              <p className="text-gray-600 mb-4 flex-1">20+高频场景，语音/文字双输入，AI实时反馈与评分</p>
+              <p className="text-gray-600 mb-4 flex-1">20+高频场景，文字输入，AI实时反馈与评分</p>
               <div className="flex justify-center items-end pb-4">
                 <Link href="/learning/language/conversation" className="btn-primary inline-block w-32 h-10 flex items-center justify-center">
                   开始对话

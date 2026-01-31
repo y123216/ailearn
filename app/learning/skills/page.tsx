@@ -37,7 +37,7 @@ export default function SkillsPractice() {
                 </svg>
               </div>
               <h2 className="text-xl font-bold mb-4">错题深度解析</h2>
-              <p className="text-gray-600 mb-6 flex-1">文字/语音双模式解析，支持追问和知识点拓展</p>
+              <p className="text-gray-600 mb-6 flex-1">文字模式解析，支持追问和知识点拓展</p>
               <div className="flex justify-center items-end pb-4">
                 <Link href="/learning/skills/analysis" className="btn-primary inline-block w-32 h-10 flex items-center justify-center">
                   查看解析

@@ -14,6 +14,18 @@ interface Question {
   tags: string[]
 }
 
+interface ErrorQuestion {
+  id: string
+  question: string
+  userAnswer: string | string[]
+  correctAnswer: string | string[]
+  explanation: string
+  category: string
+  difficulty: string
+  date: string
+  tags: string[]
+}
+
 interface Category {
   id: string
   name: string
@@ -22,12 +34,6 @@ interface Category {
 }
 
 const categories: Category[] = [
-  {
-    id: 'math',
-    name: '数学',
-    description: '涵盖代数、几何、概率等数学知识',
-    icon: '📐'
-  },
   {
     id: 'english',
     name: '英语',
@@ -51,69 +57,277 @@ const categories: Category[] = [
 // 生成模拟题目
 const generateMockQuestions = (category: string, difficulty: string, count: number): Question[] => {
   const questions: Question[] = []
+  const usedQuestionKeys = new Set<string>()
   
-  for (let i = 0; i < count; i++) {
+  let attempts = 0
+  const maxAttempts = count * 10
+  
+  while (questions.length < count && attempts < maxAttempts) {
+    attempts++
+    
     const questionTypes: Array<'multiple-choice' | 'true-false' | 'fill-blank' | 'short-answer'> = ['multiple-choice', 'true-false', 'fill-blank', 'short-answer']
     const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)]
     
     let question: Question
     
-    switch (randomType) {
-      case 'multiple-choice':
-        question = {
-          id: `mc-${Date.now()}-${i}`,
-          type: 'multiple-choice',
-          category,
-          difficulty: difficulty as 'easy' | 'medium' | 'hard',
-          question: `${i + 1}. 下列哪个选项是正确的？`,
-          options: ['选项 A', '选项 B', '选项 C', '选项 D'],
-          correctAnswer: '选项 A',
-          explanation: '解析：根据相关知识点，选项 A 是正确答案。',
-          tags: [getCategoryName(category), getDifficultyName(difficulty), '选择题']
-        }
+    switch (category) {
+      case 'english':
+        question = generateEnglishQuestion(questions.length, randomType, difficulty)
         break
-      case 'true-false':
-        question = {
-          id: `tf-${Date.now()}-${i}`,
-          type: 'true-false',
-          category,
-          difficulty: difficulty as 'easy' | 'medium' | 'hard',
-          question: `${i + 1}. 这句话是正确的吗？`,
-          correctAnswer: Math.random() > 0.5 ? '正确' : '错误',
-          explanation: '解析：根据相关知识点，这个陈述是正确的/错误的。',
-          tags: [getCategoryName(category), getDifficultyName(difficulty), '判断题']
-        }
+      case 'programming':
+        question = generateProgrammingQuestion(questions.length, randomType, difficulty)
         break
-      case 'fill-blank':
-        question = {
-          id: `fb-${Date.now()}-${i}`,
-          type: 'fill-blank',
-          category,
-          difficulty: difficulty as 'easy' | 'medium' | 'hard',
-          question: `${i + 1}. 请填写空白处的内容：_______ 是一种重要的学习方法。`,
-          correctAnswer: '练习',
-          explanation: '解析：练习是巩固知识的重要方法。',
-          tags: [getCategoryName(category), getDifficultyName(difficulty), '填空题']
-        }
+      case 'general':
+        question = generateGeneralQuestion(questions.length, randomType, difficulty)
         break
-      case 'short-answer':
-        question = {
-          id: `sa-${Date.now()}-${i}`,
-          type: 'short-answer',
-          category,
-          difficulty: difficulty as 'easy' | 'medium' | 'hard',
-          question: `${i + 1}. 请简要解释什么是人工智能？`,
-          correctAnswer: '人工智能是指计算机系统模拟人类智能的能力，包括学习、推理、感知等功能。',
-          explanation: '解析：人工智能是一个广泛的领域，涵盖了机器学习、深度学习等多个分支。',
-          tags: [getCategoryName(category), getDifficultyName(difficulty), '简答题']
-        }
-        break
+      default:
+        question = generateGeneralQuestion(questions.length, randomType, difficulty)
     }
     
-    questions.push(question)
+    const questionKey = `${question.question}-${question.type}`
+    if (!usedQuestionKeys.has(questionKey)) {
+      usedQuestionKeys.add(questionKey)
+      questions.push(question)
+    }
   }
   
   return questions
+}
+
+const generateEnglishQuestion = (index: number, type: string, difficulty: string): Question => {
+  const englishQuestions = {
+    multipleChoice: [
+      {
+        question: 'Choose the correct form of the verb: "She _____ to school every day."',
+        options: ['go', 'goes', 'going', 'went'],
+        correctAnswer: 'goes',
+        explanation: '第三人称单数一般现在时，动词要加 -es。'
+      },
+      {
+        question: 'Which word is a synonym of "happy"?',
+        options: ['sad', 'joyful', 'angry', 'tired'],
+        correctAnswer: 'joyful',
+        explanation: '"Joyful" means feeling or expressing great pleasure and happiness.'
+      },
+      {
+        question: 'Select the correct sentence:',
+        options: ['He don\'t like coffee.', 'He doesn\'t likes coffee.', 'He doesn\'t like coffee.', 'He not like coffee.'],
+        correctAnswer: 'He doesn\'t like coffee.',
+        explanation: '否定句中第三人称单数使用 "doesn\'t" + 动词原形。'
+      }
+    ],
+    trueFalse: [
+      {
+        question: 'The word "beautiful" is an adjective.',
+        correctAnswer: '正确',
+        explanation: '"Beautiful" 描述名词，是形容词。'
+      },
+      {
+        question: '"Run" is the past tense of "running".',
+        correctAnswer: '错误',
+        explanation: '"Run" 是现在时，"ran" 是过去时。'
+      }
+    ],
+    fillBlank: [
+      {
+        question: 'Complete the sentence: "I _____ English for three years." (study)',
+        correctAnswer: 'have studied',
+        explanation: '表示从过去持续到现在的动作，使用现在完成时。'
+      },
+      {
+        question: 'Fill in the blank: "The book is _____ the table." (介词)',
+        correctAnswer: 'on',
+        explanation: '表示在物体表面之上，使用介词 "on"。'
+      }
+    ],
+    shortAnswer: [
+      {
+        question: 'What is the difference between "affect" and "effect"?',
+        correctAnswer: '"Affect" is usually a verb meaning to influence, while "effect" is usually a noun meaning the result.',
+        explanation: 'Affect是动词，effect通常是名词。'
+      },
+      {
+        question: 'Explain the difference between "make" and "do".',
+        correctAnswer: '"Make" is used when creating something new, while "do" is used for actions or tasks.',
+        explanation: 'Make强调创造，do强调执行动作。'
+      }
+    ]
+  }
+  
+  return getQuestionByType(index, type, difficulty, '英语', englishQuestions)
+}
+
+const generateProgrammingQuestion = (index: number, type: string, difficulty: string): Question => {
+  const programmingQuestions = {
+    multipleChoice: [
+      {
+        question: '二分查找的时间复杂度是多少？',
+        options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'],
+        correctAnswer: 'O(log n)',
+        explanation: '二分查找每次将搜索范围减半，时间复杂度为 O(log n)。'
+      },
+      {
+        question: '哪种数据结构遵循后进先出（LIFO）原则？',
+        options: ['队列', '栈', '数组', '链表'],
+        correctAnswer: '栈',
+        explanation: '栈遵循后进先出（LIFO）原则。'
+      },
+      {
+        question: 'HTML是什么的缩写？',
+        options: ['超文本标记语言', '高科技现代语言', '超传输标记语言', '家庭工具标记语言'],
+        correctAnswer: '超文本标记语言',
+        explanation: 'HTML 是超文本标记语言的缩写。'
+      }
+    ],
+    trueFalse: [
+      {
+        question: 'Python 是编译型语言。',
+        correctAnswer: '错误',
+        explanation: 'Python 是解释型语言，不是编译型语言。'
+      },
+      {
+        question: '大多数编程语言中数组索引从 0 开始。',
+        correctAnswer: '正确',
+        explanation: '大多数编程语言中数组索引从 0 开始。'
+      }
+    ],
+    fillBlank: [
+      {
+        question: '在面向对象编程中，_____ 是创建对象的蓝图。',
+        correctAnswer: '类',
+        explanation: '类是创建对象的蓝图或模板。'
+      },
+      {
+        question: '在 JavaScript 中，使用 _____ 关键字创建新对象。',
+        correctAnswer: 'new',
+        explanation: '使用 new 关键字创建对象实例。'
+      }
+    ],
+    shortAnswer: [
+      {
+        question: '解释 JavaScript 中 == 和 === 的区别。',
+        correctAnswer: '== 会进行类型转换后比较相等性，而 === 严格比较不进行类型转换。',
+        explanation: '==会进行类型转换，===严格比较不转换类型。'
+      },
+      {
+        question: 'Python 中列表和元组的区别是什么？',
+        correctAnswer: '列表是可变的（可以修改），而元组是不可变的（不能修改）。',
+        explanation: '列表可变，元组不可变。'
+      }
+    ]
+  }
+  
+  return getQuestionByType(index, type, difficulty, '编程', programmingQuestions)
+}
+
+const generateGeneralQuestion = (index: number, type: string, difficulty: string): Question => {
+  const generalQuestions = {
+    multipleChoice: [
+      {
+        question: '法国的首都是哪里？',
+        options: ['伦敦', '柏林', '巴黎', '马德里'],
+        correctAnswer: '巴黎',
+        explanation: '巴黎是法国的首都。'
+      },
+      {
+        question: '哪个行星被称为红色星球？',
+        options: ['金星', '火星', '木星', '土星'],
+        correctAnswer: '火星',
+        explanation: '火星因表面氧化铁呈现红色，被称为红色星球。'
+      },
+      {
+        question: '人体最大的器官是什么？',
+        options: ['心脏', '肝脏', '皮肤', '大脑'],
+        correctAnswer: '皮肤',
+        explanation: '皮肤是人体最大的器官。'
+      }
+    ],
+    trueFalse: [
+      {
+        question: '中国长城在太空中用肉眼可以看到。',
+        correctAnswer: '错误',
+        explanation: '长城在太空中用肉眼是看不见的。'
+      },
+      {
+        question: '在海平面高度，水在100摄氏度沸腾。',
+        correctAnswer: '正确',
+        explanation: '在海平面高度，水在100摄氏度沸腾。'
+      }
+    ],
+    fillBlank: [
+      {
+        question: '水的化学式是 _____。',
+        correctAnswer: 'H2O',
+        explanation: '水的化学式是H2O，由两个氢原子和一个氧原子组成。'
+      },
+      {
+        question: '地球上最大的海洋是 _____。',
+        correctAnswer: '太平洋',
+        explanation: '太平洋是地球上最大的海洋。'
+      }
+    ],
+    shortAnswer: [
+      {
+        question: '解释温室效应。',
+        correctAnswer: '温室效应是指温室气体在地球表面附近捕获热量的过程。',
+        explanation: '温室效应是温室气体在地球表面附近捕获热量的过程。'
+      },
+      {
+        question: '天气和气候的区别是什么？',
+        correctAnswer: '天气指短期的大气状况，而气候指长期的天气模式。',
+        explanation: '天气是短期大气状况，气候是长期天气模式。'
+      }
+    ]
+  }
+  
+  return getQuestionByType(index, type, difficulty, '综合知识', generalQuestions)
+}
+
+const getQuestionByType = (index: number, type: string, difficulty: string, categoryName: string, questionBank: any): Question => {
+  const typeMap: Record<string, string> = {
+    'multiple-choice': 'multipleChoice',
+    'true-false': 'trueFalse',
+    'fill-blank': 'fillBlank',
+    'short-answer': 'shortAnswer'
+  }
+  
+  const typeKey = typeMap[type]
+  const questions = questionBank[typeKey]
+  const randomIndex = Math.floor(Math.random() * questions.length)
+  const selectedQuestion = questions[randomIndex]
+  
+  const baseQuestion: any = {
+    id: `${type}-${Date.now()}-${index}`,
+    type: type as any,
+    category: categoryName,
+    difficulty: difficulty as 'easy' | 'medium' | 'hard',
+    question: selectedQuestion.question,
+    correctAnswer: selectedQuestion.correctAnswer,
+    explanation: selectedQuestion.explanation,
+    tags: [categoryName, getDifficultyName(difficulty), getTypeName(type)],
+    originalQuestion: selectedQuestion.question
+  }
+  
+  if (type === 'multiple-choice' && selectedQuestion.options) {
+    baseQuestion.options = selectedQuestion.options
+  }
+  
+  return baseQuestion
+}
+
+const getTypeName = (type: string): string => {
+  switch (type) {
+    case 'multiple-choice':
+      return '选择题'
+    case 'true-false':
+      return '判断题'
+    case 'fill-blank':
+      return '填空题'
+    case 'short-answer':
+      return '简答题'
+    default:
+      return type
+  }
 }
 
 const getCategoryName = (categoryId: string): string => {
@@ -144,6 +358,7 @@ export default function AIQuestions() {
   const [showResult, setShowResult] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [score, setScore] = useState(0)
+  const [showErrorAnalysis, setShowErrorAnalysis] = useState(false)
 
   // 生成题目
   const generateQuestions = async () => {
@@ -185,26 +400,56 @@ export default function AIQuestions() {
     }
   }
 
-  // 计算分数
+  // 计算分数并收集错题
   const calculateScore = () => {
     let correctCount = 0
+    const errorQuestions: ErrorQuestion[] = []
+    
     questions.forEach(question => {
       const userAnswer = userAnswers[question.id]
-      if (!userAnswer) return
-
-      if (Array.isArray(question.correctAnswer)) {
+      let isCorrect = false
+      
+      if (!userAnswer) {
+        // 用户未回答，视为错误
+        isCorrect = false
+      } else if (Array.isArray(question.correctAnswer)) {
         if (Array.isArray(userAnswer)) {
-          const isCorrect = question.correctAnswer.every(ans => userAnswer.includes(ans)) && 
-                          userAnswer.every(ans => question.correctAnswer.includes(ans))
-          if (isCorrect) correctCount++
+          isCorrect = question.correctAnswer.every(ans => userAnswer.includes(ans)) && 
+                     userAnswer.every(ans => question.correctAnswer.includes(ans))
+        } else {
+          // 用户答案类型与正确答案类型不匹配，视为错误
+          isCorrect = false
         }
       } else {
-        if (userAnswer === question.correctAnswer) {
-          correctCount++
-        }
+        isCorrect = userAnswer === question.correctAnswer
+      }
+      
+      if (isCorrect) {
+        correctCount++
+      } else {
+        // 收集错题
+        errorQuestions.push({
+          id: question.id,
+          question: question.question,
+          userAnswer: userAnswer || '未回答',
+          correctAnswer: question.correctAnswer,
+          explanation: question.explanation || '暂无解析',
+          category: question.category,
+          difficulty: question.difficulty,
+          date: new Date().toISOString().split('T')[0],
+          tags: question.tags
+        })
       }
     })
+    
     setScore(Math.round((correctCount / questions.length) * 100))
+    
+    // 存储错题到localStorage
+    if (errorQuestions.length > 0) {
+      const existingErrors = JSON.parse(localStorage.getItem('errorQuestions') || '[]')
+      const updatedErrors = [...existingErrors, ...errorQuestions]
+      localStorage.setItem('errorQuestions', JSON.stringify(updatedErrors))
+    }
   }
 
   // 重新开始
@@ -224,7 +469,7 @@ export default function AIQuestions() {
         </header>
 
         {/* 题目生成配置 */}
-        {!questions.length || showResult ? (
+        {!questions.length && !showResult ? (
           <div className="card mb-12">
             <h2 className="text-2xl font-bold mb-6 text-center">题目配置</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -278,7 +523,10 @@ export default function AIQuestions() {
               </button>
             </div>
           </div>
-        ) : (
+        ) : null}
+
+        {/* 题目导航和当前题目 */}
+        {questions.length > 0 && !showResult && (
           <>
             {/* 题目导航 */}
             <div className="card mb-8">
@@ -436,6 +684,17 @@ export default function AIQuestions() {
                   }}
                 >
                   重新生成题目
+                </button>
+                <button
+                  className="btn-danger px-6 py-3"
+                  onClick={() => {
+                    // 确保错题数据已存储后再跳转
+                    setTimeout(() => {
+                      window.location.href = '/learning/skills/analysis'
+                    }, 100)
+                  }}
+                >
+                  错题深度解析
                 </button>
               </div>
             </div>

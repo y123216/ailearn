@@ -1,0 +1,154 @@
+一、概览
+- 目标：汇总项目中与 Creem 支付相关的全部代码，并提供最小说明，便于他人或AI快速理解与复用。
+- 流程：前端点击“购买”→ 调用后端创建 Checkout → 跳转 Creem 支付页 → 支付成功回跳到应用（带 paid=1）→ 前端处理成功态；另有 Webhook 接口用于验签与事件接收。
+
+二、环境变量
+- CREEM_API_KEY：服务端调用 Creem API 的密钥（仅后端使用）
+- NEXT_PUBLIC_CREEM_PRODUCT_ID：产品 ID（前端可读取，用作创建 Checkout 的入参）
+- NEXT_PUBLIC_APP_URL：应用基础 URL（用于拼接支付成功回跳地址）
+- CREEM_WEBHOOK_SECRET：Webhook 验签密钥（后端校验 creem-signature）
+
+三、后端接口
+1. 创建 Checkout（POST /api/creem/checkout）
+路径：src/app/api/creem/checkout/route.ts
+代码：
+```typescript
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  const apiKey = process.env.CREEM_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: "缺少 CREEM_API_KEY", failureType: "code" }, { status: 500 });
+  }
+  let parsed: unknown = null;
+  try {
+    parsed = await req.json();
+  } catch {}
+  const productId =
+    (parsed && typeof parsed === "object" && "productId" in parsed
+      ? (parsed as { productId?: string }).productId
+      : undefined) || process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID;
+  if (!productId) {
+    return NextResponse.json({ error: "缺少产品ID", failureType: "code" }, { status: 400 });
+  }
+  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const successUrl = `${base}/?paid=1`;
+  try {
+    const resp = await fetch("https://test-api.creem.io/v1/checkouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        request_id: `req_${Date.now()}`,
+        success_url: successUrl,
+        metadata: {},
+      }),
+    });
+    const data = await resp.json().catch(() => null);
+    if (!resp.ok) {
+      const status = resp.status;
+      const failureType = [400, 401, 403, 404].includes(status) ? "code" : "API";
+      return NextResponse.json(
+        { error: data?.error || "创建失败", failureType },
+        { status }
+      );
+    }
+    const url = data?.checkout_url || data?.url || "";
+    const id = data?.id || data?.checkout_id || "";
+    return NextResponse.json({ id, url, successUrl }, { status: 200 });
+  } catch {
+    return NextResponse.json({ error: "网络错误或服务不可用", failureType: "API" }, { status: 502 });
+  }
+}
+```
+
+2. Webhook 验签（POST /api/creem/webhook）
+路径：src/app/api/creem/webhook/route.ts
+代码：
+```typescript
+import { NextResponse } from "next/server";
+import crypto from "crypto";
+
+export async function POST(req: Request) {
+  const secret = process.env.CREEM_WEBHOOK_SECRET;
+  if (!secret) {
+    return NextResponse.json({ error: "缺少 CREEM_WEBHOOK_SECRET", failureType: "code" }, { status: 500 });
+  }
+  const payload = await req.text();
+  const signature = req.headers.get("creem-signature");
+  if (!signature) {
+    return NextResponse.json({ error: "缺少签名", failureType: "code" }, { status: 401 });
+  }
+  const computed = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  if (computed !== signature) {
+    return NextResponse.json({ error: "签名无效", failureType: "code" }, { status: 401 });
+  }
+  let event: unknown = null;
+  try {
+    event = JSON.parse(payload);
+  } catch {
+    return NextResponse.json({ error: "负载格式错误", failureType: "code" }, { status: 400 });
+  }
+  const type = (event && typeof event === "object" && "type" in event) ? (event as { type?: string }).type || "" : "";
+  return NextResponse.json({ ok: true, type }, { status: 200 });
+}
+```
+
+四、前端逻辑
+1. 购买按钮（handleBuy）
+路径：src/app/page.tsx
+代码：
+```typescript
+const handleBuy = async () => {
+  try {
+    const productId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID || "";
+    const resp = await fetch("/api/creem/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (resp.ok && data?.url) {
+      window.location.href = data.url as string;
+    } else {
+      const ft = data?.failureType === "API" ? "上游服务/限流" : "本地参数/配置";
+      toast.error(`支付创建失败（${ft || "API"}）：${data?.error || "请重试"}`);
+    }
+  } catch {
+    toast.error("网络异常，请稍后重试");
+  }
+};
+```
+
+2. 支付成功回跳处理（paid=1）
+路径：src/app/page.tsx
+代码：
+```typescript
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  const paid = url.searchParams.get("paid");
+  if (paid === "1") {
+    toast.success("支付成功");
+    setTimeout(() => setAuthed(true), 0);
+    url.searchParams.delete("paid");
+    const newQuery = url.searchParams.toString();
+    const newUrl = url.pathname + (newQuery ? `?${newQuery}` : "") + url.hash;
+    window.history.replaceState({}, "", newUrl);
+  }
+}, []);
+```
+
+五、调用流程
+- 前端从 NEXT_PUBLIC_CREEM_PRODUCT_ID 读取产品ID，调用 /api/creem/checkout。
+- 后端以 CREEM_API_KEY 调 Creem 创建 Checkout，成功返回 checkout_url 并拼接 success_url=APP_URL/?paid=1。
+- 浏览器跳转到 Creem 支付页，支付完成后按 success_url 回到应用，带上 paid=1。
+- 前端检测到 paid=1 后显示“支付成功”，并移除该参数以保持地址整洁。
+- Webhook 接口可用于服务端接收并校验事件（需正确配置 CREEM_WEBHOOK_SECRET 与 creem-signature）。
+
+六、说明
+- 本文件仅包含与 Creem 支付直接相关的代码与最小上下文说明；未包含无关模块。
+- 代码不含任何密钥值，仅引用环境变量名。确保在 .env.local 中正确配置对应变量后再运行。

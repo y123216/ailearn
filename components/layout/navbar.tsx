@@ -35,7 +35,7 @@ export default function Navbar() {
             <Link href="/learning/skills" className="text-gray-600 hover:text-primary font-medium">
               AI技能刷题站
             </Link>
-            <Link href="/growth" className="text-gray-600 hover:text-primary font-medium">
+            <Link href="/growth/learning" className="text-gray-600 hover:text-primary font-medium">
               增长工具
             </Link>
             {isAuthenticated ? (
@@ -101,7 +101,7 @@ export default function Navbar() {
             <Link href="/learning/skills" className="block text-gray-600 hover:text-primary font-medium px-4 py-2">
               AI技能刷题站
             </Link>
-            <Link href="/growth" className="block text-gray-600 hover:text-primary font-medium px-4 py-2">
+            <Link href="/growth/learning" className="block text-gray-600 hover:text-primary font-medium px-4 py-2">
               增长工具
             </Link>
             {isAuthenticated ? (

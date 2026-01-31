@@ -104,7 +104,6 @@ const mockErrorQuestions: ErrorQuestion[] = [
 
 const mockCategories: Category[] = [
   { id: 'programming', name: '编程', count: 5 },
-  { id: 'math', name: '数学', count: 0 },
   { id: 'english', name: '英语', count: 0 },
   { id: 'general', name: '综合', count: 0 }
 ]

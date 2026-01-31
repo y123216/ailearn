@@ -357,7 +357,6 @@ export default function ConversationPractice() {
   const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
-  const [isRecording, setIsRecording] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   const [showTranslations, setShowTranslations] = useState(true)
   const [showHints, setShowHints] = useState(true)
@@ -462,12 +461,6 @@ export default function ConversationPractice() {
       console.error('AI response error:', error)
       setIsTyping(false)
     }
-  }
-
-  // 处理语音输入
-  const handleVoiceInput = () => {
-    setIsRecording(!isRecording)
-    // 这里可以集成语音识别API
   }
 
   // 处理输入变化，生成实时提示
@@ -773,7 +766,7 @@ export default function ConversationPractice() {
       <div className="container mx-auto px-4 max-w-4xl">
         <header className="text-center mb-12">
           <h1 className="text-3xl font-bold text-primary mb-4">沉浸式对话练习</h1>
-          <p className="text-gray-600">选择场景开始练习，支持语音和文字输入</p>
+          <p className="text-gray-600">选择场景开始练习，支持文字输入</p>
         </header>
 
         {/* 场景选择 */}
@@ -974,12 +967,6 @@ export default function ConversationPractice() {
                   placeholder="输入消息..."
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
-                <button
-                  className="btn-primary"
-                  onClick={handleVoiceInput}
-                >
-                  {isRecording ? '停止录音' : '语音输入'}
-                </button>
                 <button
                   className="btn-primary"
                   onClick={handleSendMessage}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface ErrorQuestion {
   id: string
@@ -14,47 +14,73 @@ interface ErrorQuestion {
   tags: string[]
 }
 
-const mockErrorQuestions: ErrorQuestion[] = [
-  {
-    id: '1',
-    question: '下列哪个是JavaScript的基本数据类型？',
-    userAnswer: 'object',
-    correctAnswer: 'string, number, boolean, null, undefined, symbol, bigint',
-    explanation: 'JavaScript的基本数据类型包括string、number、boolean、null、undefined、symbol和bigint。object是引用数据类型。',
-    category: 'programming',
-    difficulty: 'medium',
-    date: '2026-01-24',
-    tags: ['JavaScript', '数据类型', '基础']
-  },
-  {
-    id: '2',
-    question: 'CSS中，哪个属性用于设置元素的外边距？',
-    userAnswer: 'padding',
-    correctAnswer: 'margin',
-    explanation: 'margin属性用于设置元素的外边距，padding属性用于设置元素的内边距。',
-    category: 'programming',
-    difficulty: 'easy',
-    date: '2026-01-23',
-    tags: ['CSS', '盒模型', '布局']
-  },
-  {
-    id: '3',
-    question: 'React中，useState钩子的作用是什么？',
-    userAnswer: '用于处理副作用',
-    correctAnswer: '用于在函数组件中添加状态',
-    explanation: 'useState钩子用于在React函数组件中添加状态管理，useEffect钩子用于处理副作用。',
-    category: 'programming',
-    difficulty: 'medium',
-    date: '2026-01-22',
-    tags: ['React', 'Hooks', '状态管理']
-  }
-]
-
 export default function ErrorAnalysis() {
+  const [errorQuestions, setErrorQuestions] = useState<ErrorQuestion[]>([])
   const [selectedQuestion, setSelectedQuestion] = useState<ErrorQuestion | null>(null)
   const [userQuery, setUserQuery] = useState('')
   const [aiResponse, setAiResponse] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now())
+
+  // 从localStorage加载错题数据
+  const loadErrorQuestions = () => {
+    setRefreshing(true)
+    const storedErrors = localStorage.getItem('errorQuestions')
+    if (storedErrors) {
+      try {
+        const parsedErrors = JSON.parse(storedErrors)
+        // 按日期降序排序，最新的错题在前面
+        parsedErrors.sort((a: ErrorQuestion, b: ErrorQuestion) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        )
+        setErrorQuestions(parsedErrors)
+        setLastUpdateTime(Date.now())
+      } catch (error) {
+        console.error('Failed to parse error questions:', error)
+      }
+    } else {
+      setErrorQuestions([])
+    }
+    setTimeout(() => setRefreshing(false), 500)
+  }
+
+  // 初始加载和定期检查
+  useEffect(() => {
+    loadErrorQuestions()
+    
+    // 监听localStorage变化，实时更新错题列表
+    const handleStorageChange = () => {
+      loadErrorQuestions()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // 定期检查localStorage变化（同一标签页内）
+    const checkInterval = setInterval(() => {
+      const storedErrors = localStorage.getItem('errorQuestions')
+      if (storedErrors) {
+        try {
+          const parsedErrors = JSON.parse(storedErrors)
+          const currentCount = errorQuestions.length
+          const newCount = parsedErrors.length
+          
+          // 如果错题数量发生变化，重新加载
+          if (newCount !== currentCount) {
+            console.log('错题数量变化，重新加载:', currentCount, '->', newCount)
+            loadErrorQuestions()
+          }
+        } catch (error) {
+          console.error('Failed to check error questions:', error)
+        }
+      }
+    }, 500) // 每0.5秒检查一次，提高响应速度
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(checkInterval)
+    }
+  }, [errorQuestions.length])
 
   const handleQuestionSelect = (question: ErrorQuestion) => {
     setSelectedQuestion(question)
@@ -67,14 +93,51 @@ export default function ErrorAnalysis() {
 
     setIsLoading(true)
 
-    // 模拟AI响应
+    // 保存当前选中的问题，防止异步执行期间被修改
+    const currentQuestion = selectedQuestion
+
+    // 模拟AI响应，根据问题和题目生成针对性回答
     setTimeout(() => {
-      const responses = [
-        `关于这个问题，${userQuery}的答案是基于JavaScript的基本原理。${selectedQuestion.explanation}`,
-        `针对你的问题，${userQuery}，我需要进一步解释：${selectedQuestion.explanation}。此外，你还需要注意相关的知识点。`,
-        `对于${userQuery}这个问题，关键在于理解${selectedQuestion.category}的核心概念。${selectedQuestion.explanation}`
-      ]
-      setAiResponse(responses[Math.floor(Math.random() * responses.length)])
+      // 再次检查问题是否存在
+      if (!currentQuestion) {
+        setIsLoading(false)
+        return
+      }
+
+      let response = ''
+      
+      // 根据题目类别生成不同的开头
+      const categoryPrefixes = {
+        '英语': '关于这个英语问题',
+        '编程': '关于这个编程问题',
+        '综合知识': '关于这个综合知识问题',
+        '综合': '关于这个综合知识问题'
+      }
+      
+      const prefix = categoryPrefixes[(currentQuestion.category || '综合') as keyof typeof categoryPrefixes] || '关于这个问题'
+      
+      // 根据用户问题的关键词生成不同类型的回答
+      if (userQuery.includes('为什么') || userQuery.includes('原因')) {
+        response = `${prefix}，${userQuery}的原因是：${currentQuestion.explanation || '暂无解析'}。这是因为该知识点的核心在于理解其基本原理。`
+      } else if (userQuery.includes('如何') || userQuery.includes('怎么做')) {
+        response = `${prefix}，要解决${userQuery}的问题，你需要：${currentQuestion.explanation || '暂无解析'}。建议你多做类似的练习来巩固这个知识点。`
+      } else if (userQuery.includes('区别') || userQuery.includes('不同')) {
+        response = `${prefix}，关于${userQuery}的区别，${currentQuestion.explanation || '暂无解析'}。理解这些差异对于掌握相关知识点非常重要。`
+      } else if (userQuery.includes('例子') || userQuery.includes('示例')) {
+        response = `${prefix}，${userQuery}的例子包括：${currentQuestion.explanation || '暂无解析'}。通过具体例子可以更好地理解这个概念。`
+      } else if (userQuery.includes('什么时候') || userQuery.includes('何时')) {
+        response = `${prefix}，${userQuery}的情况是：${currentQuestion.explanation || '暂无解析'}。掌握正确的使用时机是应用这个知识点的关键。`
+      } else {
+        // 默认回答
+        const defaultResponses = [
+          `${prefix}，${userQuery}的答案基于${currentQuestion.category || '综合'}的核心原理。${currentQuestion.explanation || '暂无解析'}`,
+          `针对你的问题${userQuery}，${currentQuestion.explanation || '暂无解析'}。此外，你还需要注意相关的知识点。`,
+          `对于${userQuery}这个问题，关键在于理解${currentQuestion.category || '综合'}的核心概念。${currentQuestion.explanation || '暂无解析'}`
+        ]
+        response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
+      }
+      
+      setAiResponse(response)
       setIsLoading(false)
     }, 1500)
   }
@@ -84,35 +147,78 @@ export default function ErrorAnalysis() {
       <div className="container mx-auto px-4 max-w-5xl">
         <header className="text-center mb-16">
           <h1 className="text-4xl font-bold text-purple-600 mb-4">错题深度解析</h1>
-          <p className="text-gray-600 text-lg">文字/语音双模式解析，支持追问和知识点拓展</p>
+          <p className="text-gray-600 text-lg">文字模式解析，支持追问和知识点拓展</p>
+          {errorQuestions.length > 0 && (
+            <div className="mt-4 inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm">
+              共 {errorQuestions.length} 道错题，点击刷新按钮可更新最新错题
+            </div>
+          )}
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* 错题列表 */}
           <div className="md:col-span-1">
             <div className="card h-full">
-              <h2 className="text-xl font-bold mb-4">错题列表</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">错题列表</h2>
+                <button
+                  className="btn-secondary px-3 py-1 text-sm flex items-center gap-1"
+                  onClick={loadErrorQuestions}
+                  disabled={refreshing}
+                >
+                  {refreshing ? (
+                    <>
+                      <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      刷新中...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      刷新
+                    </>
+                  )}
+                </button>
+              </div>
               <div className="space-y-4">
-                {mockErrorQuestions.map((question) => (
-                  <div
-                    key={question.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedQuestion?.id === question.id ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}`}
-                    onClick={() => handleQuestionSelect(question)}
-                  >
-                    <h3 className="font-medium mb-2 line-clamp-2">{question.question}</h3>
-                    <div className="flex justify-between text-sm text-gray-500">
-                      <span>{question.category}</span>
-                      <span>{question.date}</span>
+                {errorQuestions.length > 0 ? (
+                  errorQuestions.map((question) => (
+                    <div
+                      key={question.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedQuestion?.id === question.id ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}`}
+                      onClick={() => handleQuestionSelect(question)}
+                    >
+                      <h3 className="font-medium mb-2 line-clamp-2">{question.question}</h3>
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>{question.category}</span>
+                        <span>{question.date}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {question.tags.slice(0, 2).map((tag, index) => (
+                          <span key={index} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {question.tags.slice(0, 2).map((tag, index) => (
-                        <span key={index} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
-                          {tag}
-                        </span>
-                      ))}
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    暂无错题记录
+                    <div className="mt-4">
+                      <button
+                        className="btn-secondary px-4 py-2 text-sm"
+                        onClick={loadErrorQuestions}
+                      >
+                        点击刷新
+                      </button>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
